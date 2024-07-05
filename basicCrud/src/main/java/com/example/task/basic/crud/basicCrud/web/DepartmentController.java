@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,12 +22,16 @@ public class DepartmentController {
     }
 
     @PostMapping("/department")
-    public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO) {
-        DepartmentDTO savedDepartment = departmentService.save(departmentDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
+    public DepartmentDTO addDepartment(@RequestBody DepartmentDTO departmentDTO) {
+        try {
+            DepartmentDTO savedDepartment = departmentService.save(departmentDTO);
+            return savedDepartment;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
-    @GetMapping("/departments")
+    @GetMapping("/department")
     public ResponseEntity<List<DepartmentDTO>> getAllDepartments() {
         return ResponseEntity.ok().body(departmentService.getAllDepartments());
     }

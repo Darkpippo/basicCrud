@@ -25,6 +25,9 @@ public class DepartmentImpl implements DepartmentService {
     @Transactional
     @Override
     public DepartmentDTO save(DepartmentDTO departmentDTO) {
+        if(departmentDTO.getId() != null) {
+            throw new IllegalArgumentException("You cannot send id when creating a department");
+        }
         if(departmentDTO.getName()!=null && !departmentDTO.getName().isEmpty()){
             Department department = Department.builder()
                     .name(departmentDTO.getName())
@@ -33,7 +36,7 @@ public class DepartmentImpl implements DepartmentService {
             departmentRepository.save(department);
             return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
         } else {
-            throw new InvalidDepartmentDtoException();
+            throw new IllegalArgumentException("Invalid department name");
         }
     }
 
