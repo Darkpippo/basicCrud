@@ -8,18 +8,19 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Entity
+@Data
+@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
+@Entity
 @Table(name = "t_locations")
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
+    private UUID uuid;
     private String name;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
+    @ManyToOne(cascade=CascadeType.MERGE)
+    @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 }

@@ -3,6 +3,7 @@ package com.example.task.basic.crud.basicCrud.service.impl;
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
+import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentDtoException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.model.mappers.DepartmentMapper;
 import com.example.task.basic.crud.basicCrud.repository.DepartmentRepository;
@@ -32,7 +33,7 @@ public class DepartmentImpl implements DepartmentService {
             departmentRepository.save(department);
             return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
         } else {
-            throw new InvalidDepartmentIdException();
+            throw new InvalidDepartmentDtoException();
         }
     }
 
@@ -59,11 +60,11 @@ public class DepartmentImpl implements DepartmentService {
 
     @Override
     public DepartmentDTO getDepartmentByName(String name) {
-        Department department = departmentRepository.findByName(name);
+        Department department = departmentRepository.findByNameIgnoreCase(name);
         if (department != null) {
             return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
         } else {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Department not found");
         }
     }
 
@@ -72,6 +73,17 @@ public class DepartmentImpl implements DepartmentService {
     public DepartmentDTO deleteDepartmentById(String id) {
         Department department = departmentRepository.findById(UUID.fromString(id)).orElseThrow(InvalidDepartmentIdException::new);
         departmentRepository.delete(department);
+        return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
+    }
+
+    @Override
+    public DepartmentDTO deleteDepartmentByName(String name) {
+        Department department = departmentRepository.findByNameIgnoreCase(name);
+        if (department != null) {
+            departmentRepository.delete(department);
+        } else {
+            throw new IllegalArgumentException("Department not found");
+        }
         return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
     }
 }

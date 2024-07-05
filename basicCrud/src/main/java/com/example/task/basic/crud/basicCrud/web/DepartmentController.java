@@ -43,9 +43,15 @@ public class DepartmentController {
         return ResponseEntity.ok().body(departmentDTO);
     }
 
-    @DeleteMapping("/department/delete/{name}")
+    @DeleteMapping("/department/delete/id/{id}")
+    public ResponseEntity<DepartmentDTO> deleteDepartmentById(@PathVariable String id) {
+        DepartmentDTO departmentDTO = departmentService.deleteDepartmentById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
+    }
+
+    @DeleteMapping("/department/delete/name/{name}")
     public ResponseEntity<DepartmentDTO> deleteDepartmentByName(@PathVariable String name) {
-        DepartmentDTO departmentDTO = departmentService.deleteDepartmentById(name);
+        DepartmentDTO departmentDTO = departmentService.deleteDepartmentByName(name);
         return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
     }
 }

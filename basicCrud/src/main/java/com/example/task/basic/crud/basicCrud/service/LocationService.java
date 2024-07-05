@@ -1,5 +1,16 @@
 package com.example.task.basic.crud.basicCrud.service;
 
-public interface LocationService {
+import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
+import com.example.task.basic.crud.basicCrud.model.dto.LocationDTO;
 
+import java.util.List;
+
+public interface LocationService {
+    LocationDTO save(LocationDTO locationDTO);
+    List<LocationDTO> findAll();
+    LocationDTO findById(String id);
+    LocationDTO findByName(String name);
+    List<LocationDTO> findByDepartment(DepartmentDTO departmentDTO);
+    LocationDTO delete(String id);
+    LocationDTO deleteByName(String name);
 }

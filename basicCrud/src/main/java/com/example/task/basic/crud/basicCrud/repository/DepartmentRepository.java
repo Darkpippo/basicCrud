@@ -7,5 +7,5 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface DepartmentRepository extends JpaRepository<Department, UUID> {
-    Department findByName(String name);
+    Department findByNameIgnoreCase(String name);
 }
