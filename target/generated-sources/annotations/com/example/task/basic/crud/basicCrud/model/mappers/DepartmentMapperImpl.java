@@ -2,12 +2,14 @@ package com.example.task.basic.crud.basicCrud.model.mappers;
 
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import javax.annotation.processing.Generated;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2024-07-04T19:20:47+0200",
+    date = "2024-07-05T13:09:37+0200",
     comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.11 (Amazon.com Inc.)"
 )
 public class DepartmentMapperImpl implements DepartmentMapper {
@@ -29,6 +31,20 @@ public class DepartmentMapperImpl implements DepartmentMapper {
     }
 
     @Override
+    public List<DepartmentDTO> toRegularDepartmentDTOs(List<Department> departments) {
+        if ( departments == null ) {
+            return null;
+        }
+
+        List<DepartmentDTO> list = new ArrayList<DepartmentDTO>( departments.size() );
+        for ( Department department : departments ) {
+            list.add( departmentToDepartmentDTO( department ) );
+        }
+
+        return list;
+    }
+
+    @Override
     public Department departmentDTOToDepartment(DepartmentDTO departmentDTO) {
         if ( departmentDTO == null ) {
             return null;
@@ -42,5 +58,19 @@ public class DepartmentMapperImpl implements DepartmentMapper {
         department.name( departmentDTO.getName() );
 
         return department.build();
+    }
+
+    @Override
+    public List<Department> toRegularDepartments(List<DepartmentDTO> departmentDTOs) {
+        if ( departmentDTOs == null ) {
+            return null;
+        }
+
+        List<Department> list = new ArrayList<Department>( departmentDTOs.size() );
+        for ( DepartmentDTO departmentDTO : departmentDTOs ) {
+            list.add( departmentDTOToDepartment( departmentDTO ) );
+        }
+
+        return list;
     }
 }

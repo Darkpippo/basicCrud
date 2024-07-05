@@ -44,6 +44,8 @@ public class DepartmentImpl implements DepartmentService {
         for(Department department : departments) {
             departmentDTOList.add(DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department));
         }
+//        nejke da rab
+//        DepartmentMapper.INSTANCE.toRegularDepartmentDTOs(departments);
         return departmentDTOList;
     }
 

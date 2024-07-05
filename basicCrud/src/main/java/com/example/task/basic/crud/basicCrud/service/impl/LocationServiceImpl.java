@@ -12,7 +12,6 @@ import com.example.task.basic.crud.basicCrud.repository.LocationRepository;
 import com.example.task.basic.crud.basicCrud.service.DepartmentService;
 import com.example.task.basic.crud.basicCrud.service.LocationService;
 import jakarta.transaction.Transactional;
-import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

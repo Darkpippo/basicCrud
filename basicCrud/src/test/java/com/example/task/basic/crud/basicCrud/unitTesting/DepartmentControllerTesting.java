@@ -1,0 +1,184 @@
+package com.example.task.basic.crud.basicCrud.unitTesting;
+
+import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
+import com.example.task.basic.crud.basicCrud.service.DepartmentService;
+import com.example.task.basic.crud.basicCrud.web.DepartmentController;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.UUID;
+
+@WebMvcTest(DepartmentController.class)
+public class DepartmentControllerTesting {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private DepartmentService departmentService;
+
+    private DepartmentDTO departmentDTO;
+    private String departmentId;
+
+    @BeforeEach
+    public void setup() {
+        MockitoAnnotations.openMocks(this);
+
+        // Setup sample data
+        departmentId = UUID.randomUUID().toString();
+        departmentDTO = new DepartmentDTO(departmentId, "Engineering");
+    }
+
+    @Test
+    public void testAddDepartment_Success() throws Exception {
+        // Mock the service call
+        when(departmentService.save(any(DepartmentDTO.class))).thenReturn(departmentDTO);
+
+        // Perform the POST request and assert the results
+        mockMvc.perform(post("/api/department")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"" + departmentId + "\",\"name\":\"Engineering\"}"))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.id").value(departmentId))
+                .andExpect(jsonPath("$.name").value("Engineering"));
+    }
+
+    @Test
+    public void testGetAllDepartments_Success() throws Exception {
+        DepartmentDTO department1 = new DepartmentDTO(UUID.randomUUID().toString(), "HR");
+        DepartmentDTO department2 = new DepartmentDTO(UUID.randomUUID().toString(), "Marketing");
+        List<DepartmentDTO> departments = Arrays.asList(department1, department2);
+
+        when(departmentService.getAllDepartments()).thenReturn(departments);
+
+        mockMvc.perform(get("/api/departments")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(departments.size()))
+                .andExpect(jsonPath("$[0].name").value(department1.getName()))
+                .andExpect(jsonPath("$[1].name").value(department2.getName()));
+    }
+    @Test
+    public void testGetDepartmentById_Success() throws Exception {
+        // Mock the service call
+        when(departmentService.getDepartmentById(departmentId)).thenReturn(departmentDTO);
+
+        // Perform the GET request and assert the results
+        mockMvc.perform(get("/api/department/id/" + departmentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(departmentId))
+                .andExpect(jsonPath("$.name").value("Engineering"));
+    }
+
+    @Test
+    public void testGetDepartmentByName_Success() throws Exception {
+        // Mock the service call
+        when(departmentService.getDepartmentByName("Engineering")).thenReturn(departmentDTO);
+
+        // Perform the GET request and assert the results
+        mockMvc.perform(get("/api/department/name/Engineering")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(departmentId))
+                .andExpect(jsonPath("$.name").value("Engineering"));
+    }
+
+    @Test
+    public void testDeleteDepartmentById_Success() throws Exception {
+        // Mock the service call
+        when(departmentService.deleteDepartmentById(departmentId)).thenReturn(departmentDTO);
+
+        // Perform the DELETE request and assert the results
+        mockMvc.perform(delete("/api/department/delete/id/" + departmentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(departmentId))
+                .andExpect(jsonPath("$.name").value("Engineering"));
+    }
+
+    @Test
+    public void testDeleteDepartmentByName_Success() throws Exception {
+        // Mock the service call
+        when(departmentService.deleteDepartmentByName("Engineering")).thenReturn(departmentDTO);
+
+        // Perform the DELETE request and assert the results
+        mockMvc.perform(delete("/api/department/delete/name/Engineering")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(departmentId))
+                .andExpect(jsonPath("$.name").value("Engineering"));
+    }
+
+    @Test
+    public void testAddDepartment_Failure() throws Exception {
+        when(departmentService.save(any(DepartmentDTO.class))).thenThrow(new RuntimeException("Department not created"));
+
+        mockMvc.perform(post("/api/department")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"id\":\"" + departmentId + "\",\"name\":\"Engineering\"}"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Department not created"));
+    }
+
+    @Test
+    public void testGetDepartmentById_Failure() throws Exception {
+        // Mock the service call to throw an exception
+        when(departmentService.getDepartmentById(departmentId)).thenThrow(new RuntimeException("Department not found"));
+
+        // Perform the GET request and assert the results
+        mockMvc.perform(get("/api/department/id/" + departmentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Department not found"));
+    }
+
+    @Test
+    public void testGetDepartmentByName_Failure() throws Exception {
+        // Mock the service call to throw an exception
+        when(departmentService.getDepartmentByName("Engineering")).thenThrow(new RuntimeException("Department not found"));
+
+        // Perform the GET request and assert the results
+        mockMvc.perform(get("/api/department/name/Engineering")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Department not found"));
+    }
+
+    @Test
+    public void testDeleteDepartmentById_Failure() throws Exception {
+        // Mock the service call to throw an exception
+        when(departmentService.deleteDepartmentById(departmentId)).thenThrow(new RuntimeException("Department not found"));
+
+        // Perform the DELETE request and assert the results
+        mockMvc.perform(delete("/api/department/delete/id/" + departmentId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Department not found"));
+    }
+
+    @Test
+    public void testDeleteDepartmentByName_Failure() throws Exception {
+        // Mock the service call to throw an exception
+        when(departmentService.deleteDepartmentByName("Engineering")).thenThrow(new RuntimeException("Department not found"));
+
+        // Perform the DELETE request and assert the results
+        mockMvc.perform(delete("/api/department/delete/name/Engineering")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.error").value("Department not found"));
+    }
+}
