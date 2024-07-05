@@ -2,6 +2,7 @@ package com.example.task.basic.crud.basicCrud.service.impl;
 
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
+import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.model.mappers.DepartmentMapper;
 import com.example.task.basic.crud.basicCrud.repository.DepartmentRepository;
@@ -11,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -23,11 +25,9 @@ public class DepartmentImpl implements DepartmentService {
     @Override
     public DepartmentDTO save(DepartmentDTO departmentDTO) {
         if(departmentDTO.getName()!=null && !departmentDTO.getName().isEmpty()){
-//            Department department = Department.builder()
-//                    .uuid(UUID.randomUUID())
-//                    .name(departmentDTO.getName())
-//                    .build();
-            Department department = new Department(UUID.randomUUID(), departmentDTO.getName());
+            Department department = Department.builder()
+                    .name(departmentDTO.getName())
+                    .build();
 
             departmentRepository.save(department);
             return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
@@ -48,16 +48,25 @@ public class DepartmentImpl implements DepartmentService {
 
     @Override
     public DepartmentDTO getDepartmentById(String id) {
-        UUID uuid = UUID.fromString(id);
-        Department department = departmentRepository.findById(uuid).orElseThrow(InvalidDepartmentIdException::new);
-        return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
+        try {
+            UUID uuid = UUID.fromString(id);
+            Department department = departmentRepository.findById(uuid).orElseThrow(InvalidDepartmentIdException::new);
+            return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(e.getMessage());
+        }
     }
 
     @Override
     public DepartmentDTO getDepartmentByName(String name) {
         Department department = departmentRepository.findByName(name);
-        return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
+        if (department != null) {
+            return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
+        } else {
+            throw new IllegalArgumentException();
+        }
     }
+
 
     @Override
     public DepartmentDTO deleteDepartmentById(String id) {

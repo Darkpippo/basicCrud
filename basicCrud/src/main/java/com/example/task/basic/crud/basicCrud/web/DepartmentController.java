@@ -1,6 +1,7 @@
 package com.example.task.basic.crud.basicCrud.web;
 
 
+import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.service.DepartmentService;
 import lombok.AllArgsConstructor;
@@ -22,11 +23,29 @@ public class DepartmentController {
     @PostMapping("/department")
     public ResponseEntity<DepartmentDTO> addDepartment(@RequestBody DepartmentDTO departmentDTO) {
         DepartmentDTO savedDepartment = departmentService.save(departmentDTO);
-        return ResponseEntity.ok(savedDepartment);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedDepartment);
     }
 
     @GetMapping("/departments")
     public List<DepartmentDTO> getAllDepartments() {
         return departmentService.getAllDepartments();
+    }
+
+    @GetMapping("/department/id/{id}")
+    public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable String id) {
+        DepartmentDTO department = departmentService.getDepartmentById(id);
+        return ResponseEntity.ok().body(department);
+    }
+
+    @GetMapping("/department/name/{name}")
+    public ResponseEntity<DepartmentDTO> getDepartmentByName(@PathVariable String name) {
+        DepartmentDTO departmentDTO = departmentService.getDepartmentByName(name);
+        return ResponseEntity.ok().body(departmentDTO);
+    }
+
+    @DeleteMapping("/department/delete/{name}")
+    public ResponseEntity<DepartmentDTO> deleteDepartmentByName(@PathVariable String name) {
+        DepartmentDTO departmentDTO = departmentService.deleteDepartmentById(name);
+        return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
     }
 }
