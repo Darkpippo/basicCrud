@@ -4,6 +4,7 @@ import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.Location;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.dto.LocationDTO;
+import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidLocationDtoException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidLocationIdException;
 import com.example.task.basic.crud.basicCrud.model.mappers.DepartmentMapper;
@@ -29,6 +30,9 @@ public class LocationServiceImpl implements LocationService {
     @Transactional
     @Override
     public LocationDTO save(LocationDTO locationDTO) {
+        if(locationDTO.getId()!=null) {
+            throw new BadRequestException("You cannot send id when creating a location");
+        }
         if(locationDTO.getName()!=null && !locationDTO.getName().isEmpty()){
             DepartmentDTO departmentDTO = departmentService.getDepartmentByName(locationDTO.getDepartment().getName());
             Department department = DepartmentMapper.INSTANCE.departmentDTOToDepartment(departmentDTO);

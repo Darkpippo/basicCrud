@@ -27,9 +27,14 @@ public class LocationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(savedLocation);
     }
 
-    @GetMapping("/locations")
+    @GetMapping("/location")
     public ResponseEntity<List<LocationDTO>> listLocations() {
-        return ResponseEntity.ok().body(locationService.findAll());
+        List<LocationDTO> locationDTOList = locationService.findAll();
+        if(locationDTOList.isEmpty()) {
+            return ResponseEntity.status(204).body(locationDTOList);
+        } else {
+            return ResponseEntity.ok().body(locationService.findAll());
+        }
     }
 
     @GetMapping("/location/name/{name}")

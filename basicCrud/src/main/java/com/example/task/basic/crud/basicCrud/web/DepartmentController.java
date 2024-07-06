@@ -3,6 +3,8 @@ package com.example.task.basic.crud.basicCrud.web;
 
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
+import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
+import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
 import com.example.task.basic.crud.basicCrud.service.DepartmentService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -24,8 +26,11 @@ public class DepartmentController {
     @PostMapping("/department")
     public DepartmentDTO addDepartment(@RequestBody DepartmentDTO departmentDTO) {
         try {
-            DepartmentDTO savedDepartment = departmentService.save(departmentDTO);
-            return savedDepartment;
+            return departmentService.save(departmentDTO);
+        } catch (BadRequestException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DepartmentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
@@ -33,30 +38,67 @@ public class DepartmentController {
 
     @GetMapping("/department")
     public ResponseEntity<List<DepartmentDTO>> getAllDepartments() {
-        return ResponseEntity.ok().body(departmentService.getAllDepartments());
+        List<DepartmentDTO> departmentDTOS = departmentService.getAllDepartments();
+        if(departmentDTOS.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(departmentDTOS);
+        } else {
+            return ResponseEntity.ok().body(departmentDTOS);
+        }
     }
 
     @GetMapping("/department/id/{id}")
     public ResponseEntity<DepartmentDTO> getDepartmentById(@PathVariable String id) {
-        DepartmentDTO department = departmentService.getDepartmentById(id);
-        return ResponseEntity.ok().body(department);
+        try {
+            DepartmentDTO department = departmentService.getDepartmentById(id);
+            return ResponseEntity.ok().body(department);
+        } catch (BadRequestException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DepartmentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @GetMapping("/department/name/{name}")
     public ResponseEntity<DepartmentDTO> getDepartmentByName(@PathVariable String name) {
-        DepartmentDTO departmentDTO = departmentService.getDepartmentByName(name);
-        return ResponseEntity.ok().body(departmentDTO);
+        try {
+            DepartmentDTO departmentDTO = departmentService.getDepartmentByName(name);
+            return ResponseEntity.ok().body(departmentDTO);
+        } catch (BadRequestException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DepartmentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @DeleteMapping("/department/delete/id/{id}")
     public ResponseEntity<DepartmentDTO> deleteDepartmentById(@PathVariable String id) {
-        DepartmentDTO departmentDTO = departmentService.deleteDepartmentById(id);
-        return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
+        try {
+            DepartmentDTO departmentDTO = departmentService.deleteDepartmentById(id);
+            return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
+        } catch (BadRequestException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DepartmentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @DeleteMapping("/department/delete/name/{name}")
     public ResponseEntity<DepartmentDTO> deleteDepartmentByName(@PathVariable String name) {
-        DepartmentDTO departmentDTO = departmentService.deleteDepartmentByName(name);
-        return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
+        try {
+            DepartmentDTO departmentDTO = departmentService.deleteDepartmentByName(name);
+            return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
+        } catch (BadRequestException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DepartmentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 }
