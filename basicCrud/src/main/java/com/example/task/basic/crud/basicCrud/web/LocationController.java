@@ -3,6 +3,8 @@ package com.example.task.basic.crud.basicCrud.web;
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.Location;
 import com.example.task.basic.crud.basicCrud.model.dto.LocationDTO;
+import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
+import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidLocationException;
 import com.example.task.basic.crud.basicCrud.model.mappers.LocationMapper;
 import com.example.task.basic.crud.basicCrud.service.LocationService;
@@ -12,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,9 +25,17 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping("/location")
-    public ResponseEntity<LocationDTO> createLocation(@Valid @RequestBody LocationDTO locationDTO) {
-        LocationDTO savedLocation = locationService.save(locationDTO);
-        return ResponseEntity.status(HttpStatus.CREATED).body(savedLocation);
+    @ResponseStatus(HttpStatus.CREATED)
+    public LocationDTO createLocation(@Valid @RequestBody LocationDTO locationDTO) {
+        try {
+            return locationService.save(locationDTO);
+        } catch (BadRequestException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
+        } catch (DepartmentNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @GetMapping("/location")

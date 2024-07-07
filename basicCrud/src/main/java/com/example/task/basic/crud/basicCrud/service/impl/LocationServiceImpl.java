@@ -33,8 +33,11 @@ public class LocationServiceImpl implements LocationService {
         if(locationDTO.getId()!=null) {
             throw new BadRequestException("You cannot send id when creating a location");
         }
+        if(locationDTO.getDepartment()==null || locationDTO.getDepartment().getName().isBlank()) {
+            throw new BadRequestException("Department must be provided");
+        }
+        DepartmentDTO departmentDTO = departmentService.getDepartmentByName(locationDTO.getDepartment().getName());
         if(locationDTO.getName()!=null && !locationDTO.getName().isEmpty()){
-            DepartmentDTO departmentDTO = departmentService.getDepartmentByName(locationDTO.getDepartment().getName());
             Department department = DepartmentMapper.INSTANCE.departmentDTOToDepartment(departmentDTO);
             Location location = Location.builder()
                     .name(locationDTO.getName())
@@ -44,7 +47,7 @@ public class LocationServiceImpl implements LocationService {
             locationRepository.save(location);
             return LocationMapper.INSTANCE.locationToLocationDTO(location);
         }else {
-            throw new InvalidLocationDtoException();
+            throw new BadRequestException("Bad request Location name is empty");
         }
     }
 

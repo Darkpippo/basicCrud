@@ -6,6 +6,7 @@ import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
 import com.example.task.basic.crud.basicCrud.service.DepartmentService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +25,8 @@ public class DepartmentController {
     }
 
     @PostMapping("/department")
-    public DepartmentDTO addDepartment(@RequestBody DepartmentDTO departmentDTO) {
+    @ResponseStatus(HttpStatus.CREATED)
+    public DepartmentDTO addDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) {
         try {
             return departmentService.save(departmentDTO);
         } catch (BadRequestException e) {

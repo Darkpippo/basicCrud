@@ -25,13 +25,11 @@ import java.util.List;
 import java.util.UUID;
 
 @WebMvcTest(DepartmentController.class)
-public class DepartmentControllerTesting {
+public class DepartmentControllerTest {
     @Autowired
-    private MockMvc mockMvc;
-
+private MockMvc mockMvc;
     @MockBean
     private DepartmentService departmentService;
-
     private DepartmentDTO departmentDTO;
     private String departmentId;
 
@@ -50,7 +48,7 @@ public class DepartmentControllerTesting {
         mockMvc.perform(post("/api/department")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Engineering\"}"))
-                .andExpect(status().isOk())
+                .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(departmentDTO.getId()))
                 .andExpect(jsonPath("$.name").value("Engineering"));
     }
