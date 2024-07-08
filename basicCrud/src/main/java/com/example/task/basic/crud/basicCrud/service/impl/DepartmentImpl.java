@@ -42,6 +42,28 @@ public class DepartmentImpl implements DepartmentService {
     }
 
     @Override
+    public DepartmentDTO update(String id, DepartmentDTO departmentDTO) {
+        if(isValidUUID(id)) {
+            validateDepartmentDTO(departmentDTO);
+            Department savedDepartment = departmentRepository.findById(UUID.fromString(id)).orElseThrow(InvalidDepartmentIdException::new);
+            savedDepartment.setName(departmentDTO.getName());
+            departmentRepository.save(savedDepartment);
+            return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(savedDepartment);
+        } else {
+            throw new BadRequestException("Invalid department id");
+        }
+    }
+
+    private void validateDepartmentDTO(DepartmentDTO departmentDTO) {
+        if (departmentDTO == null) {
+            throw new BadRequestException("DepartmentDTO cannot be null");
+        }
+        if (departmentDTO.getName() == null || departmentDTO.getName().trim().isEmpty()) {
+            throw new BadRequestException("Department name cannot be null or empty");
+        }
+    }
+
+    @Override
     public List<DepartmentDTO> getAllDepartments() {
         List<Department> departments = departmentRepository.findAll();
         List<DepartmentDTO> departmentDTOList = new ArrayList<>();
@@ -56,8 +78,9 @@ public class DepartmentImpl implements DepartmentService {
     @Override
     public DepartmentDTO getDepartmentById(String id) {
         if(isValidUUID(id)) {
-            Department department = departmentRepository.findById(UUID.fromString(id)).orElseThrow(InvalidDepartmentIdException::new);
-            return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
+            return departmentRepository.findById(UUID.fromString(id))
+                    .map(DepartmentMapper.INSTANCE::departmentToDepartmentDTO)
+                    .orElseThrow(InvalidDepartmentIdException::new);
         } else  {
             throw new BadRequestException("Invalid id");
         }
@@ -74,6 +97,9 @@ public class DepartmentImpl implements DepartmentService {
 
     @Override
     public DepartmentDTO getDepartmentByName(String name) {
+        if(name.isEmpty()) {
+            throw new BadRequestException("Invalid name");
+        }
         Department department = departmentRepository.findByNameIgnoreCase(name);
         if (department != null) {
             return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);

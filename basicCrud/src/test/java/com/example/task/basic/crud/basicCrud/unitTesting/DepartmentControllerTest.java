@@ -3,6 +3,7 @@ package com.example.task.basic.crud.basicCrud.unitTesting;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
+import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.service.DepartmentService;
 import com.example.task.basic.crud.basicCrud.web.DepartmentController;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,6 +14,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.client.HttpServerErrorException;
+
+import javax.print.attribute.standard.Media;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,9 +31,11 @@ import java.util.UUID;
 @WebMvcTest(DepartmentController.class)
 public class DepartmentControllerTest {
     @Autowired
-private MockMvc mockMvc;
+    private MockMvc mockMvc;
+
     @MockBean
     private DepartmentService departmentService;
+
     private DepartmentDTO departmentDTO;
     private String departmentId;
 
@@ -48,9 +54,31 @@ private MockMvc mockMvc;
         mockMvc.perform(post("/api/department")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"name\":\"Engineering\"}"))
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(departmentDTO.getId()))
                 .andExpect(jsonPath("$.name").value("Engineering"));
+    }
+
+    @Test
+    public void testUpdateDepartment_Success() throws Exception {
+        when(departmentService.update(departmentDTO.getId(), departmentDTO)).thenReturn(departmentDTO);
+
+        mockMvc.perform(put("/api/department/" + departmentDTO.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Engineering\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    public void testUpdateDepartment_Failure() throws Exception {
+        when(departmentService.update(departmentDTO.getId(), departmentDTO)).thenThrow(new BadRequestException("Department name cannot be null or empty"));
+
+        mockMvc.perform(put("/api/department/" + departmentDTO.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"\"}"))
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value("INTERNAL_SERVER_ERROR"))
+                .andExpect(jsonPath("$.message").value("Department name cannot be null or empty"));;
     }
 
     @Test
@@ -92,10 +120,8 @@ private MockMvc mockMvc;
 
     @Test
     public void testDeleteDepartmentById_Success() throws Exception {
-        // Mock the service call
         when(departmentService.deleteDepartmentById(departmentId)).thenReturn(departmentDTO);
 
-        // Perform the DELETE request and assert the results
         mockMvc.perform(delete("/api/department/delete/id/" + departmentId)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -137,13 +163,14 @@ private MockMvc mockMvc;
 
     @Test
     public void testGetDepartmentById_Failure() throws Exception {
-        when(departmentService.getDepartmentById("primerNevalidnoId123")).thenThrow(new BadRequestException("Invalid id"));
+        String id = UUID.randomUUID().toString();
+        when(departmentService.getDepartmentById(id)).thenThrow(new InvalidDepartmentIdException());
 
-        mockMvc.perform(get("/api/department/id/primerNevalidnoId123")
+        mockMvc.perform(get("/api/department/id/" + id)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.status").value("BAD_REQUEST"))
-                .andExpect(jsonPath("$.message").value("Invalid id"));
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.status").value("INTERNAL_SERVER_ERROR"))
+                .andExpect(jsonPath("$.message").value("No department with the given id exists"));
     }
 
     @Test

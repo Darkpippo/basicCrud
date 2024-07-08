@@ -25,7 +25,6 @@ public class DepartmentController {
     }
 
     @PostMapping("/department")
-    @ResponseStatus(HttpStatus.CREATED)
     public DepartmentDTO addDepartment(@Valid @RequestBody DepartmentDTO departmentDTO) {
         try {
             return departmentService.save(departmentDTO);
@@ -33,6 +32,15 @@ public class DepartmentController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (DepartmentNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PutMapping("/department/{id}")
+    public DepartmentDTO updateDepartment(@PathVariable String id, @Valid @RequestBody DepartmentDTO departmentDTO) {
+        try {
+            return departmentService.update(id, departmentDTO);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
@@ -53,10 +61,6 @@ public class DepartmentController {
         try {
             DepartmentDTO department = departmentService.getDepartmentById(id);
             return ResponseEntity.ok().body(department);
-        } catch (BadRequestException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-        } catch (DepartmentNotFoundException e) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }

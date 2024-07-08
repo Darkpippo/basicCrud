@@ -2,7 +2,6 @@ package com.example.task.basic.crud.basicCrud.model.dto;
 
 import lombok.*;
 
-
 @Getter
 @Setter
 @AllArgsConstructor

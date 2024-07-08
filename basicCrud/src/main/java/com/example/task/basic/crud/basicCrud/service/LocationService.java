@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface LocationService {
     LocationDTO save(LocationDTO locationDTO);
+    LocationDTO update(String id, LocationDTO locationDTO);
     List<LocationDTO> findAll();
     LocationDTO findById(String id);
     LocationDTO findByName(String name);

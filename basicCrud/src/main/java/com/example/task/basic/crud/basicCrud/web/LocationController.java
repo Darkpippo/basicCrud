@@ -1,16 +1,12 @@
 package com.example.task.basic.crud.basicCrud.web;
 
-import com.example.task.basic.crud.basicCrud.model.Department;
-import com.example.task.basic.crud.basicCrud.model.Location;
 import com.example.task.basic.crud.basicCrud.model.dto.LocationDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
-import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidLocationException;
-import com.example.task.basic.crud.basicCrud.model.mappers.LocationMapper;
 import com.example.task.basic.crud.basicCrud.service.LocationService;
 import jakarta.validation.Valid;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +21,6 @@ public class LocationController {
     private final LocationService locationService;
 
     @PostMapping("/location")
-    @ResponseStatus(HttpStatus.CREATED)
     public LocationDTO createLocation(@Valid @RequestBody LocationDTO locationDTO) {
         try {
             return locationService.save(locationDTO);
@@ -33,6 +28,15 @@ public class LocationController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
         } catch (DepartmentNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+    @PutMapping("/location/{id}")
+    public LocationDTO updateLocation(@PathVariable String id, @Valid @RequestBody LocationDTO locationDTO) {
+        try {
+            return locationService.update(id, locationDTO);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
@@ -55,7 +59,12 @@ public class LocationController {
 
     @GetMapping("/location/id/{id}")
     public ResponseEntity<LocationDTO> getLocationById(@PathVariable String id) {
-        return ResponseEntity.ok().body(locationService.findById(id));
+        try {
+            LocationDTO locationDTO = locationService.findById(id);
+            return ResponseEntity.ok().body(locationDTO);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
     @DeleteMapping("/location/delete/name/{name}")

@@ -33,9 +33,6 @@ public class LocationServiceImpl implements LocationService {
         if(locationDTO.getId()!=null) {
             throw new BadRequestException("You cannot send id when creating a location");
         }
-        if(locationDTO.getDepartment()==null || locationDTO.getDepartment().getName().isBlank()) {
-            throw new BadRequestException("Department must be provided");
-        }
         DepartmentDTO departmentDTO = departmentService.getDepartmentByName(locationDTO.getDepartment().getName());
         if(locationDTO.getName()!=null && !locationDTO.getName().isEmpty()){
             Department department = DepartmentMapper.INSTANCE.departmentDTOToDepartment(departmentDTO);
@@ -52,6 +49,35 @@ public class LocationServiceImpl implements LocationService {
     }
 
     @Override
+    public LocationDTO update(String id, LocationDTO locationDTO) {
+        if(isValidUUID(id)) {
+            validateLocationDTO(locationDTO);
+            Location savedLocation = locationRepository.findById(UUID.fromString(id)).orElseThrow(InvalidLocationIdException::new);
+
+            DepartmentDTO incomingDepartmentDTO = departmentService.getDepartmentByName(locationDTO.getDepartment().getName());
+
+            savedLocation.setName(locationDTO.getName());
+            savedLocation.setDepartment(DepartmentMapper.INSTANCE.departmentDTOToDepartment(incomingDepartmentDTO));
+            locationRepository.save(savedLocation);
+            return LocationMapper.INSTANCE.locationToLocationDTO(savedLocation);
+        } else {
+            throw new BadRequestException("Invalid location id");
+        }
+    }
+
+    private void validateLocationDTO(LocationDTO locationDTO) {
+        if(locationDTO == null) {
+            throw new BadRequestException("LocationDTO cannot be null");
+        }
+        if (locationDTO.getName() == null || locationDTO.getName().trim().isEmpty()) {
+            throw new BadRequestException("Location name cannot be null or empty");
+        }
+        if(locationDTO.getDepartment() == null || locationDTO.getDepartment().getName() == null || locationDTO.getDepartment().getName().trim().isEmpty()) {
+            throw new BadRequestException("Location department cannot be null or empty");
+        }
+    }
+
+    @Override
     public List<LocationDTO> findAll() {
         List<Location> locations = locationRepository.findAll();
         List<LocationDTO> locationDTOList = new ArrayList<>();
@@ -63,12 +89,21 @@ public class LocationServiceImpl implements LocationService {
 
     @Override
     public LocationDTO findById(String id) {
+        if(isValidUUID(id)) {
+            return locationRepository.findById(UUID.fromString(id))
+                    .map(LocationMapper.INSTANCE::locationToLocationDTO)
+                    .orElseThrow(InvalidLocationIdException::new);
+        } else {
+            throw new BadRequestException("Invalid id");
+        }
+    }
+
+    private static boolean isValidUUID(String id) {
         try {
             UUID uuid = UUID.fromString(id);
-            Location location = locationRepository.findById(uuid).orElseThrow(InvalidLocationIdException::new);
-            return LocationMapper.INSTANCE.locationToLocationDTO(location);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e.getMessage());
+            return true;
+        } catch (IllegalArgumentException ex) {
+            return false;
         }
     }
 
