@@ -14,6 +14,7 @@ import com.example.task.basic.crud.basicCrud.service.DepartmentService;
 import com.example.task.basic.crud.basicCrud.service.LocationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.postgresql.shaded.com.ongres.scram.common.util.Preconditions;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;

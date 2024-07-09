@@ -43,39 +43,44 @@ public class LocationController {
     }
 
     @GetMapping("/location")
-    public ResponseEntity<List<LocationDTO>> listLocations() {
-        List<LocationDTO> locationDTOList = locationService.findAll();
-        if(locationDTOList.isEmpty()) {
-            return ResponseEntity.status(204).body(locationDTOList);
-        } else {
-            return ResponseEntity.ok().body(locationService.findAll());
-        }
-    }
-
-    @GetMapping("/location/name/{name}")
-    public ResponseEntity<LocationDTO> getLocationByName(@PathVariable String name) {
-        return ResponseEntity.ok().body(locationService.findByName(name));
-    }
-
-    @GetMapping("/location/id/{id}")
-    public ResponseEntity<LocationDTO> getLocationById(@PathVariable String id) {
+    public List<LocationDTO> listLocations() {
         try {
-            LocationDTO locationDTO = locationService.findById(id);
-            return ResponseEntity.ok().body(locationDTO);
+            return locationService.findAll();
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
 
-    @DeleteMapping("/location/delete/name/{name}")
-    public ResponseEntity<LocationDTO> deleteLocationByName(@PathVariable String name) {
-        LocationDTO locationDTO = locationService.deleteByName(name);
-        return ResponseEntity.ok().body(locationDTO);
+    @GetMapping("/location/name/{name}")
+    public LocationDTO getLocationByName(@PathVariable String name) {
+        try {
+            return locationService.findByName(name);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 
+    @GetMapping("/location/id/{id}")
+    public LocationDTO getLocationById(@PathVariable String id) {
+        try {
+            return locationService.findById(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
+    }
+
+//    @DeleteMapping("/location/delete/name/{name}")
+//    public ResponseEntity<LocationDTO> deleteLocationByName(@PathVariable String name) {
+//        LocationDTO locationDTO = locationService.deleteByName(name);
+//        return ResponseEntity.ok().body(locationDTO);
+//    }
+
     @DeleteMapping("/location/delete/id/{id}")
-    public ResponseEntity<LocationDTO> deleteLocationById(@PathVariable String id) {
-        LocationDTO locationDTO = locationService.delete(id);
-        return ResponseEntity.ok().body(locationDTO);
+    public LocationDTO deleteLocationById(@PathVariable String id) {
+        try {
+            return locationService.delete(id);
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
+        }
     }
 }

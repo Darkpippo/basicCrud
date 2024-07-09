@@ -4,7 +4,6 @@ import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
-import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentDtoException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.model.mappers.DepartmentMapper;
 import com.example.task.basic.crud.basicCrud.repository.DepartmentRepository;
@@ -14,13 +13,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 
 @Service
 @RequiredArgsConstructor
-public class DepartmentImpl implements DepartmentService {
+public class DepartmentServiceImpl implements DepartmentService {
     private final DepartmentRepository departmentRepository;
 
     @Transactional
@@ -82,7 +80,7 @@ public class DepartmentImpl implements DepartmentService {
                     .map(DepartmentMapper.INSTANCE::departmentToDepartmentDTO)
                     .orElseThrow(InvalidDepartmentIdException::new);
         } else  {
-            throw new BadRequestException("Invalid id");
+            throw new BadRequestException("Wrong id format :D");
         }
     }
 
