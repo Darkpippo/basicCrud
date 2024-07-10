@@ -20,9 +20,16 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
+
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
+
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class DepartmentServiceTest {
@@ -59,21 +66,30 @@ public class DepartmentServiceTest {
         assertThat(result.getName()).isEqualTo("Dev ops");
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void addDepartmentNoNameProvided_Failure() {
         DepartmentDTO departmentDTO = new DepartmentDTO();
         departmentDTO.setName("");
 
-        departmentService.save(departmentDTO);
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            departmentService.save(departmentDTO);
+        });
+
+        assertEquals("Invalid department name", exception.getMessage());
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void addDepartmentIdProvided_Failure() {
         DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setId(UUID.randomUUID().toString());
         departmentDTO.setName("HR");
 
-        departmentService.save(departmentDTO);
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->
+        {
+            departmentDTO.setId(UUID.randomUUID().toString());
+            departmentService.save(departmentDTO);
+        });
+
+        assertEquals("You cannot send id when creating a department", exception.getMessage());
     }
 
     @Test
@@ -97,23 +113,28 @@ public class DepartmentServiceTest {
         verify(departmentRepository, times(1)).save(department);
     }
 
-    @Test(expected = InvalidDepartmentIdException.class)
-    public void testUpdateDepartment_NotFound() {
+    @Test
+    public void testUpdateDepartmentNoNameProvided_Failure() {
         String id = UUID.randomUUID().toString();
         DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setId(id);
-        departmentDTO.setName("HR");
 
-        departmentService.update(id, departmentDTO);
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->{
+            departmentService.update(id, departmentDTO);
+        });
+
+        assertEquals("Department name cannot be null or empty", exception.getMessage());
     }
 
-    @Test(expected = BadRequestException.class)
-    public void testUpdateDepartment_InvalidId() {
-        String invalidId = "invalid-uuid";
-        DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setId(invalidId);
+    @Test
+    public void testUpdateDepartmentNullDTO_Failure() {
+        String id = UUID.randomUUID().toString();
+        DepartmentDTO departmentDTO = null;
 
-        departmentService.update(invalidId, departmentDTO);
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->{
+            departmentService.update(id, departmentDTO);
+        });
+
+        assertEquals("DepartmentDTO cannot be null", exception.getMessage());
     }
 
     @Test
@@ -123,35 +144,37 @@ public class DepartmentServiceTest {
         departmentDTO.setId(id);
         departmentDTO.setName("HR");
 
-        when(departmentRepository.findById(UUID.fromString(id))).thenReturn(Optional.empty());
+        InvalidDepartmentIdException exception = assertThrows(InvalidDepartmentIdException.class, () ->{
+            departmentService.getDepartmentById(id);
+        });
+
+        assertEquals("No department with the given id exists", exception.getMessage());
     }
 
-    @Test(expected = BadRequestException.class)
+    @Test
     public void testFindByIdInvalidFormat_Failure() {
         String id = "invalid-uuid";
-        DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setId(id);
 
-        departmentService.getDepartmentById(id);
+        BadRequestException exception = assertThrows(BadRequestException.class, () ->{
+            departmentService.getDepartmentById(id);
+        });
+
+        assertEquals("Wrong id format :D", exception.getMessage());
     }
 
     @Test
     public void testFindById_Success() {
-        String id = UUID.randomUUID().toString();
-
-        DepartmentDTO departmentDTO = new DepartmentDTO();
-        departmentDTO.setName("Dev ops");
-
         Department department = new Department();
-        department.setUuid(UUID.fromString(id));
+        department.setUuid(UUID.randomUUID());
         department.setName("Dev ops");
 
-        when(departmentRepository.findById(UUID.fromString(id))).thenReturn(Optional.of(department));
+        when(departmentRepository.findById(UUID.fromString(department.getUuid().toString())))
+                .thenReturn(Optional.of(department));
 
-        DepartmentDTO result = departmentService.getDepartmentById(id);
+        DepartmentDTO result = departmentService.getDepartmentById(department.getUuid().toString());
 
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(id);
+        assertThat(result.getId()).isEqualTo(department.getUuid().toString());
         assertThat(result.getName()).isEqualTo("Dev ops");
     }
 }

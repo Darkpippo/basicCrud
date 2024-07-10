@@ -42,7 +42,7 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentDTO update(String id, DepartmentDTO departmentDTO) {
         if(isValidUUID(id)) {
-            validateDepartmentDTO(departmentDTO);
+            validateDepartmentDTO(departmentDTO); // tuka dali e podobro ili vnatre, ama puka u momentot ako nema json nikakov
             Department savedDepartment = departmentRepository.findById(UUID.fromString(id)).orElseThrow(InvalidDepartmentIdException::new);
             savedDepartment.setName(departmentDTO.getName());
             departmentRepository.save(savedDepartment);
@@ -68,8 +68,6 @@ public class DepartmentServiceImpl implements DepartmentService {
         for(Department department : departments) {
             departmentDTOList.add(DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department));
         }
-//        nejke da rab
-//        DepartmentMapper.INSTANCE.toRegularDepartmentDTOs(departments);
         return departmentDTOList;
     }
 
@@ -109,7 +107,6 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentDTO deleteDepartmentById(String id) {
-        // kako da frli vakov exception
         if(id==null || id.isEmpty()) {
             throw new BadRequestException("No id was passed");
         }
