@@ -1,14 +1,12 @@
-package com.example.task.basic.crud.basicCrud.unitTesting;
+package com.example.task.basic.crud.basicCrud.test;
 
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
-import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.model.mappers.DepartmentMapper;
 import com.example.task.basic.crud.basicCrud.repository.DepartmentRepository;
 
-import static org.assertj.core.api.Assertions.as;
 import static org.mockito.Mockito.*;
 
 import java.util.Optional;
@@ -20,13 +18,10 @@ import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.http.HttpStatus;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.assertj.core.api.Assertions.assertThat;
-
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

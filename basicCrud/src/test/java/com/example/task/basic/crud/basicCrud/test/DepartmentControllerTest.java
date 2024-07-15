@@ -1,8 +1,7 @@
-package com.example.task.basic.crud.basicCrud.unitTesting;
+package com.example.task.basic.crud.basicCrud.test;
 
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
-import com.example.task.basic.crud.basicCrud.model.exceptions.DepartmentNotFoundException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.service.DepartmentService;
 import com.example.task.basic.crud.basicCrud.web.DepartmentController;
@@ -14,9 +13,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.client.HttpServerErrorException;
-
-import javax.print.attribute.standard.Media;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -131,17 +127,6 @@ public class DepartmentControllerTest {
                 .andExpect(jsonPath("$.id").value(departmentId))
                 .andExpect(jsonPath("$.name").value("Engineering"));
     }
-
-//    @Test
-//    public void testDeleteDepartmentByName_Success() throws Exception {
-//        when(departmentService.deleteDepartmentByName("Engineering")).thenReturn(departmentDTO);
-//
-//        mockMvc.perform(delete("/api/department/delete/name/Engineering")
-//                        .contentType(MediaType.APPLICATION_JSON))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.id").value(departmentId))
-//                .andExpect(jsonPath("$.name").value("Engineering"));
-//    }
 
     @Test
     public void testAddDepartment_Failure_name() throws Exception {

@@ -1,11 +1,10 @@
-package com.example.task.basic.crud.basicCrud.unitTesting;
+package com.example.task.basic.crud.basicCrud.test;
 
 import com.example.task.basic.crud.basicCrud.model.Department;
 import com.example.task.basic.crud.basicCrud.model.Location;
 import com.example.task.basic.crud.basicCrud.model.dto.DepartmentDTO;
 import com.example.task.basic.crud.basicCrud.model.dto.LocationDTO;
 import com.example.task.basic.crud.basicCrud.model.exceptions.BadRequestException;
-import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidDepartmentIdException;
 import com.example.task.basic.crud.basicCrud.model.exceptions.InvalidLocationIdException;
 import com.example.task.basic.crud.basicCrud.model.mappers.DepartmentMapper;
 import com.example.task.basic.crud.basicCrud.repository.LocationRepository;
@@ -19,6 +18,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -27,6 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @Slf4j
 @ExtendWith(MockitoExtension.class)
@@ -143,5 +148,56 @@ public class LocationServiceTest {
         });
 
         assertEquals("Location name cannot be null or empty", exception.getMessage());
+    }
+
+    @Test
+    public void findById_Success() {
+        String id = location.getUuid().toString();
+        when(locationRepository.findById(UUID.fromString(id))).thenReturn(Optional.of(location));
+
+        LocationDTO result = locationService.findById(id);
+
+        assertEquals("Old name", result.getName());
+    }
+
+    @Test
+    public void findById_InvalidFormat_Failure() {
+        String id = "Invalid format id";
+
+        BadRequestException exception = assertThrows(BadRequestException.class, () -> {
+            locationService.findById(id);
+        });
+
+        assertEquals("Invalid id", exception.getMessage());
+    }
+
+    @Test
+    public void findById_NoDepartment_Failure() {
+        String id = UUID.randomUUID().toString();
+
+        InvalidLocationIdException exception = assertThrows(InvalidLocationIdException.class, () -> {
+            locationService.findById(id);
+        });
+
+        assertEquals("No location with the given id exists.", exception.getMessage());
+    }
+
+    @Test
+    public void findAll_Success() {
+        List<Location> locations = Arrays.asList(
+                new Location(UUID.randomUUID(), "Location1", department),
+                new Location(UUID.randomUUID(), "Location2", department)
+        );
+
+        when(locationRepository.findAll()).thenReturn(locations);
+
+        List<LocationDTO> result = locationService.findAll();
+
+        assertThat(result).isNotNull();
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).getName()).isEqualTo("Location1");
+        assertThat(result.get(1).getName()).isEqualTo("Location2");
+
+        verify(locationRepository, times(1)).findAll();
     }
 }
