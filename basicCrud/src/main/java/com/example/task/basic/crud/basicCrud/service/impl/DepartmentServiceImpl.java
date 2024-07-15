@@ -118,15 +118,4 @@ public class DepartmentServiceImpl implements DepartmentService {
             throw new BadRequestException("Invalid id");
         }
     }
-
-    @Override
-    public DepartmentDTO deleteDepartmentByName(String name) {
-        Department department = departmentRepository.findByNameIgnoreCase(name);
-        if (department != null) {
-            departmentRepository.delete(department);
-        } else {
-            throw new DepartmentNotFoundException("Department not found");
-        }
-        return DepartmentMapper.INSTANCE.departmentToDepartmentDTO(department);
-    }
 }

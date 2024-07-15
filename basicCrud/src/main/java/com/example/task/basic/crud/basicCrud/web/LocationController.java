@@ -69,12 +69,6 @@ public class LocationController {
         }
     }
 
-//    @DeleteMapping("/location/delete/name/{name}")
-//    public ResponseEntity<LocationDTO> deleteLocationByName(@PathVariable String name) {
-//        LocationDTO locationDTO = locationService.deleteByName(name);
-//        return ResponseEntity.ok().body(locationDTO);
-//    }
-
     @DeleteMapping("/location/delete/id/{id}")
     public LocationDTO deleteLocationById(@PathVariable String id) {
         try {

@@ -13,5 +13,4 @@ public interface LocationService {
     LocationDTO findByName(String name);
     List<LocationDTO> findByDepartment(DepartmentDTO departmentDTO);
     LocationDTO delete(String id);
-    LocationDTO deleteByName(String name);
 }

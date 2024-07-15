@@ -135,15 +135,4 @@ public class LocationServiceImpl implements LocationService {
         locationRepository.delete(location);
         return LocationMapper.INSTANCE.locationToLocationDTO(location);
     }
-
-    @Override
-    public LocationDTO deleteByName(String name) {
-        Location location = locationRepository.findByNameIgnoreCase(name);
-        if(location != null) {
-            locationRepository.delete(location);
-        } else {
-            throw new IllegalArgumentException("Location not found");
-        }
-        return LocationMapper.INSTANCE.locationToLocationDTO(location);
-    }
 }

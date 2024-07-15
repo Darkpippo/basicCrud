@@ -12,5 +12,4 @@ public interface DepartmentService {
     DepartmentDTO getDepartmentById(String id);
     DepartmentDTO getDepartmentByName(String name);
     DepartmentDTO deleteDepartmentById(String id);
-    DepartmentDTO deleteDepartmentByName(String name);
 }

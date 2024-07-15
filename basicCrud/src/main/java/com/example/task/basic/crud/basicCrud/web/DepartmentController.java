@@ -87,18 +87,4 @@ public class DepartmentController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
         }
     }
-
-//    @DeleteMapping("/department/delete/name/{name}")
-//    public ResponseEntity<DepartmentDTO> deleteDepartmentByName(@PathVariable String name) {
-//        try {
-//            DepartmentDTO departmentDTO = departmentService.deleteDepartmentByName(name);
-//            return ResponseEntity.status(HttpStatus.OK).body(departmentDTO);
-//        } catch (BadRequestException e) {
-//            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, e.getMessage());
-//        } catch (DepartmentNotFoundException e) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
-//        } catch (Exception e) {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-//        }
-//    }
 }
